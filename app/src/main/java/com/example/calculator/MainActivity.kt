@@ -103,6 +103,47 @@ class MainActivity : AppCompatActivity() {
         else return number
     }
 
+    private fun processingConclusion(concl: String, l: Double) {
+        var conclusion = concl
+        if (conclusion[conclusion.length - 1] == '0'
+            && conclusion[conclusion.length - 2] == '.') {
+            conclusion = conclusion.substring(0, conclusion.length - 2)
+        }
+        if (conclusion != "-0") {
+            if (conclusion.length > 14) {
+                if (conclusion.contains("E")) {
+                    val indOfE = conclusion.indexOf('E')
+                    val partE = conclusion.substring(indOfE)
+                    val partELength = partE.length
+
+                    var firstPartOfPad = conclusion.substring(0, 11 - partELength)
+                    pad.text = "=" + pointToComma(firstPartOfPad) + ".." + partE
+                }
+                else {
+
+                    pad.text = "=" + pointToComma(conclusion.substring(0, 11)) + ".."
+                }
+            }
+            else {
+                pad.text = '=' + pointToComma(conclusion)
+            }
+        } else {
+            pad.text = "=0"
+        }
+
+        if (l != 0.0) {
+            first = pointToComma(conclusion)
+            newCircle = false
+        }
+        else  {
+            first = ""
+            newCircle = true
+        }
+        last = ""
+        afterOp = ""
+        operation = ""
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -181,6 +222,63 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        percent.setOnClickListener {
+            if (last.isNotEmpty() && last != "-") {
+
+                var toMultiplicate: Int = 1
+
+                if (operation == "*" || operation == "/") {
+                    if (first.contains('-')) {
+                        toMultiplicate *= -1
+                        first = first.drop(1)
+                    }
+                    if (last.contains('-')) {
+                        toMultiplicate *= -1
+                        last = last.drop(1)
+                    }
+                } else {
+                    if (last.contains('-')) {
+                        last = last.drop(1)
+                        when(operation) {
+                            "+" -> operation = "-"
+                            "-" -> operation = "+"
+                        }
+                    }
+                }
+
+                var f = commaToPoint(first).toDouble()
+                var l = commaToPoint(last).toDouble()
+
+                if (operation == "*" || operation == "/") {
+                    l /= 100
+                } else {
+                    l = l/100 * f
+                }
+
+                var conclusion: String = ""
+                when(operation) {
+                    "+"->{
+                        conclusion = ((f + l)*toMultiplicate).toString()
+                    }
+                    "-"->{
+                        conclusion = ((f - l)*toMultiplicate).toString()
+                    }
+                    "*"->{
+                        conclusion = ((f * l)*toMultiplicate).toString()
+                    }
+                    "/"->{
+                        if (l == 0.0) {
+                            conclusion = "Can't divide by 0"
+                        } else {
+                            conclusion = ((f / l) * toMultiplicate).toString()
+                        }
+                    }
+                }
+
+                processingConclusion(conclusion, l)
+            }
+        }
+
         equal.setOnClickListener {
             if (last.isNotEmpty() && last != "-") {
 
@@ -202,52 +300,9 @@ class MainActivity : AppCompatActivity() {
                             conclusion = (f / l).toString()
                         }
                     }
-                    "%" -> {
-                        if (l == 0.0) {
-                            conclusion = "0.0"
-                        } else {
-                            conclusion = (f % l).toString()
-                        }
-                    }
                 }
 
-                if (conclusion[conclusion.length - 1] == '0'
-                    && conclusion[conclusion.length - 2] == '.') {
-                    conclusion = conclusion.substring(0, conclusion.length - 2)
-                }
-                if (conclusion != "-0") {
-                    if (conclusion.length > 14) {
-                        if (conclusion.contains("E")) {
-                            val indOfE = conclusion.indexOf('E')
-                            val partE = conclusion.substring(indOfE)
-                            val partELength = partE.length
-
-                            var firstPartOfPad = conclusion.substring(0, 11 - partELength)
-                            pad.text = "=" + pointToComma(firstPartOfPad) + ".." + partE
-                        }
-                        else {
-
-                            pad.text = "=" + pointToComma(conclusion.substring(0, 11)) + ".."
-                        }
-                    }
-                    else {
-                        pad.text = '=' + pointToComma(conclusion)
-                    }
-                } else {
-                    pad.text = "=0"
-                }
-
-                if (l != 0.0) {
-                    first = pointToComma(conclusion)
-                    newCircle = false
-                }
-                else  {
-                    first = ""
-                    newCircle = true
-                }
-                last = ""
-                afterOp = ""
-                operation = ""
+                processingConclusion(conclusion, l)
             }
         }
     }

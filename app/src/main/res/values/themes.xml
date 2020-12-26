@@ -23,8 +23,9 @@
     <style name="forButton">
         <item name="android:textSize">29sp</item>
         <item name= "android:textColor">@color/ButtonText</item>
-        <item name="font">@font/montserrat_italic</item>
+        <item name="fontFamily">@font/montserrat_italic</item>
         <item name="fontStyle">normal</item>
+        <item name="android:textStyle">bold</item>
         <item name="android:textAlignment">center</item>
         <item name="android:background">@color/buttonBackground</item>
     </style>
@@ -32,7 +33,8 @@
     <style name="forOperationButton">
         <item name="android:textSize">29sp</item>
         <item name= "android:textColor">@color/buttonBackground</item>
-        <item name="font">@font/montserrat_italic</item>
+        <item name="fontFamily">@font/montserrat_italic</item>
+        <item name="android:textStyle">bold</item>
         <item name="fontStyle">normal</item>
         <item name="android:textAlignment">center</item>
         <item name="android:background">@color/ButtonText</item>
