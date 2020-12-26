@@ -14,18 +14,18 @@ class MainActivity : AppCompatActivity() {
     var afterOp: String = ""
     var newCircle = true
 
-    fun firstCheck() {
+    private fun firstCheck() {
         if (first.length > 14) {
-            pad.text = first.substring(first.length - 14, first.length)
+            pad.text = ".." + first.substring(first.length - 12, first.length)
         } else {
             pad.text = first
         }
     }
 
-    fun lastCheck() {
+    private fun lastCheck() {
         if (afterOp.length + last.length > 14) {
-            pad.text = (afterOp + last).substring(
-                (afterOp + last).length - 14,
+            pad.text = ".." + (afterOp + last).substring(
+                (afterOp + last).length - 12,
                 (afterOp + last).length
             )
         } else {
@@ -33,7 +33,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun operationProcessing(oper: String) {
+    private fun operationProcessing(oper: String) {
         if (first.isNotEmpty() && first != "-" && last.isEmpty()) {
             if (oper == "×") {
                 operation = "*"
@@ -54,10 +54,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun addNumber(num: String) {
+    private fun addNumber(num: String) {
         if (operation.isEmpty()) {
             if (!newCircle) {
-                newCircle = true;
+                newCircle = true
                 first = ""
             }
 
@@ -89,14 +89,14 @@ class MainActivity : AppCompatActivity() {
         operationProcessing(v.text.toString())
     }
 
-    fun pointToComma(number: String): String {
+    private fun pointToComma(number: String): String {
         if (number.contains('.')) {
             return number.replace('.', ',')
         }
         else return number
     }
 
-    fun commaToPoint(number: String): String {
+    private fun commaToPoint(number: String): String {
         if (number.contains(',')) {
             return number.replace(',', '.')
         }
@@ -153,7 +153,7 @@ class MainActivity : AppCompatActivity() {
                         }
                     } else {
                         if (first != "0") {
-                            first = '-' + first
+                            first = "-" + first
                         }
                         else {
                             first = "-"
