@@ -9,5 +9,7 @@
     <color name="white">#FFFFFFFF</color>
     <color name="buttonBackground">#F1F3F6</color>
     <color name="ButtonText">#3A4E89</color>
+    <color name="TitleColor">#373A37</color>
+    <color name="backgroundColor">#E5E5E5</color>
 
 </resources>

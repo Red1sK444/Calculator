@@ -1,308 +1,65 @@
 package com.example.calculator
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
+import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.Group
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
 
-    var first: String = ""
-    var last: String = ""
-    var operation: String = ""
-    var afterOp: String = ""
-    var newCircle = true
-
-    private fun firstCheck() {
-        if (first.length > 14) {
-            pad.text = ".." + first.substring(first.length - 12, first.length)
-        } else {
-            pad.text = first
+    private fun Group.setAllOnClickListener(listener: View.OnClickListener?) {
+        referencedIds.forEach { id ->
+            rootView.findViewById<View>(id).setOnClickListener(listener)
         }
     }
 
-    private fun lastCheck() {
-        if (afterOp.length + last.length > 14) {
-            pad.text = ".." + (afterOp + last).substring(
-                (afterOp + last).length - 12,
-                (afterOp + last).length
-            )
-        } else {
-            pad.text = afterOp + last
-        }
-    }
-
-    private fun operationProcessing(oper: String) {
-        if (first.isNotEmpty() && first != "-" && last.isEmpty()) {
-            if (oper == "×") {
-                operation = "*"
-            }
-            else if (oper == "÷") {
-                operation = "/"
-            }
-            else {
-                operation = oper
-            }
-
-            afterOp = first
-            first += operation
-
-            firstCheck()
-            first = afterOp
-            afterOp = first + operation
-        }
-    }
-
-    private fun addNumber(num: String) {
-        if (operation.isEmpty()) {
-            if (!newCircle) {
-                newCircle = true
-                first = ""
-            }
-
-            if (first == "0") {
-                first = num
-            }
-            else if (!(first == "-" && num == "0")) {
-                first += num
-            }
-            firstCheck()
-        } else {
-            if (last == "0") {
-                last = num
-            }
-            else if (!(last == "-" && num == "0")) {
-                last += num
-            }
-        lastCheck()
-        }
-    }
-
-    fun clickOnDigit(v: View) {
-        v as Button
-        addNumber(v.text.toString())
-    }
-
-    fun clickOnOperation(v: View) {
-        v as Button
-        operationProcessing(v.text.toString())
-    }
-
-    private fun pointToComma(number: String): String {
-        if (number.contains('.')) {
-            return number.replace('.', ',')
-        }
-        else return number
-    }
-
-    private fun commaToPoint(number: String): String {
-        if (number.contains(',')) {
-            return number.replace(',', '.')
-        }
-        else return number
-    }
-
-    private fun processingConclusion(concl: String, l: Double) {
-        var conclusion = concl
-        if (conclusion[conclusion.length - 1] == '0'
-            && conclusion[conclusion.length - 2] == '.') {
-            conclusion = conclusion.substring(0, conclusion.length - 2)
-        }
-        if (conclusion != "-0") {
-            if (conclusion.length > 14) {
-                if (conclusion.contains("E")) {
-                    val indOfE = conclusion.indexOf('E')
-                    val partE = conclusion.substring(indOfE)
-                    val partELength = partE.length
-
-                    var firstPartOfPad = conclusion.substring(0, 11 - partELength)
-                    pad.text = "=" + pointToComma(firstPartOfPad) + ".." + partE
-                }
-                else {
-
-                    pad.text = "=" + pointToComma(conclusion.substring(0, 11)) + ".."
-                }
-            }
-            else {
-                pad.text = '=' + pointToComma(conclusion)
-            }
-        } else {
-            pad.text = "=0"
-        }
-
-        if (l != 0.0) {
-            first = pointToComma(conclusion)
-            newCircle = false
-        }
-        else  {
-            first = ""
-            newCircle = true
-        }
-        last = ""
-        afterOp = ""
-        operation = ""
-    }
+    private val calculator = CalculatorProcessing()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        ac.setOnClickListener {
-            if (pad.text.isNotEmpty()) {
-                pad.text = "0"
-                first = "0"
-                last = ""
-                afterOp = ""
-                operation = ""
-                newCircle = true
+        groupOfNumbers.setAllOnClickListener(View.OnClickListener {
+            val num = (it as Button).text.toString()
+            padText.text = calculator.clickOnDigit(num)
+        })
+
+        groupOfOperations.setAllOnClickListener(View.OnClickListener {
+            val oper = (it as Button).text.toString()
+            val forPad = calculator.clickOnOperation(oper)
+            if (forPad != null) {
+                padText.text = forPad
+            }
+        })
+
+        acButton.setOnClickListener {
+            padText.text = calculator.processingAC(padText.text.toString())
+        }
+
+        commaButton.setOnClickListener {
+            val forPad = calculator.processingComma()
+            if (forPad != null) {
+                padText.text = forPad
             }
         }
 
-        comma.setOnClickListener {
-            if (operation.isEmpty()) {
-                if (newCircle) {
-                    if (first.isNotEmpty() && !(first.length == 1 && first == "-")) {
-                        if (!first.contains(',')) {
-                            first += ","
-                        }
-                    } else {
-                        first += "0,"
-                    }
-                    firstCheck()
-                }
-            } else {
-                if (last.isNotEmpty() && !(last.length == 1 && last == "-")) {
-                    if (!last.contains(',')) {
-                        last += ","
-                    }
-                } else {
-                    last += "0,"
-                }
-                lastCheck()
+        plusminusButton.setOnClickListener {
+            padText.text = calculator.processingPlusMinus()
+        }
+
+        percentButton.setOnClickListener {
+            val forPad = calculator.processingPercent()
+            if (forPad != null) {
+                padText.text = forPad
             }
         }
 
-        plusminus.setOnClickListener {
-            if (operation.isEmpty()) {
-
-                if (first.length >= 1) {
-                    if (first[0] == '-') {
-                        first = first.drop(1)
-                        if (first.length == 0) {
-                            first = "0"
-                        }
-                    } else {
-                        if (first != "0") {
-                            first = "-" + first
-                        }
-                        else {
-                            first = "-"
-                        }
-                    }
-                } else {
-                    first = "-"
-                }
-                firstCheck()
-
-            } else {
-
-                if (last.length >= 1) {
-                    if (last[0] == '-') {
-                        last = last.drop(1)
-                    } else {
-                        if (last != "0") {
-                            last = '-' + last
-                        }
-                    }
-                } else {
-                    last = "-"
-                }
-                lastCheck()
-            }
-        }
-
-        percent.setOnClickListener {
-            if (last.isNotEmpty() && last != "-") {
-
-                var toMultiplicate: Int = 1
-
-                if (operation == "*" || operation == "/") {
-                    if (first.contains('-')) {
-                        toMultiplicate *= -1
-                        first = first.drop(1)
-                    }
-                    if (last.contains('-')) {
-                        toMultiplicate *= -1
-                        last = last.drop(1)
-                    }
-                } else {
-                    if (last.contains('-')) {
-                        last = last.drop(1)
-                        when(operation) {
-                            "+" -> operation = "-"
-                            "-" -> operation = "+"
-                        }
-                    }
-                }
-
-                var f = commaToPoint(first).toDouble()
-                var l = commaToPoint(last).toDouble()
-
-                if (operation == "*" || operation == "/") {
-                    l /= 100
-                } else {
-                    l = l/100 * f
-                }
-
-                var conclusion: String = ""
-                when(operation) {
-                    "+"->{
-                        conclusion = ((f + l)*toMultiplicate).toString()
-                    }
-                    "-"->{
-                        conclusion = ((f - l)*toMultiplicate).toString()
-                    }
-                    "*"->{
-                        conclusion = ((f * l)*toMultiplicate).toString()
-                    }
-                    "/"->{
-                        if (l == 0.0) {
-                            conclusion = "Can't divide by 0"
-                        } else {
-                            conclusion = ((f / l) * toMultiplicate).toString()
-                        }
-                    }
-                }
-
-                processingConclusion(conclusion, l)
-            }
-        }
-
-        equal.setOnClickListener {
-            if (last.isNotEmpty() && last != "-") {
-
-                first = commaToPoint(first)
-                last = commaToPoint(last)
-
-                val f: Double = first.toDouble()
-                val l: Double = last.toDouble()
-                var conclusion: String = ""
-
-                when (operation) {
-                    "+" -> conclusion = (f + l).toString()
-                    "-" -> conclusion = (f - l).toString()
-                    "*" -> conclusion = (f * l).toString()
-                    "/" -> {
-                        if (l == 0.0) {
-                            conclusion = "Can't divide by 0"
-                        } else {
-                            conclusion = (f / l).toString()
-                        }
-                    }
-                }
-
-                processingConclusion(conclusion, l)
+        equalButton.setOnClickListener {
+            val forPad = calculator.processingEquality()
+            if (forPad != null) {
+                padText.text = forPad
             }
         }
     }
