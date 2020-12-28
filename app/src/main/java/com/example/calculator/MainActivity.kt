@@ -52,14 +52,22 @@ class MainActivity : AppCompatActivity() {
         percentButton.setOnClickListener {
             val forPad = calculator.processingPercent()
             if (forPad != null) {
-                padText.text = forPad
+                if (forPad == getString(R.string.exceptionConfirmed)) {
+                    padText.text = getString(R.string.divideException)
+                } else {
+                    padText.text = forPad
+                }
             }
         }
 
         equalButton.setOnClickListener {
             val forPad = calculator.processingEquality()
             if (forPad != null) {
-                padText.text = forPad
+                if (forPad == getString(R.string.exceptionConfirmed)) {
+                    padText.text = getString(R.string.divideException)
+                } else {
+                    padText.text = forPad
+                }
             }
         }
     }

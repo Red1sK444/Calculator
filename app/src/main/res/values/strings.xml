@@ -26,4 +26,6 @@
     <string name="conclusionSecond">=%s..</string>
     <string name="conclusionThird">=%s</string>
     <string name="checkSigns">%s%s</string>
+    <string name="exceptionConfirmed">=/0</string>
+    <string name="divideException">CAN\'T DIVIDE</string>
 </resources>
